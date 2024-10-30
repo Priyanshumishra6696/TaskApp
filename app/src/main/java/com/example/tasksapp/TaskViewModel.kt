@@ -1,39 +1,63 @@
 package com.example.tasksapp
 
-import androidx.lifecycle.LiveData
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tasksapp.roomdb.DataBaseInstance
 import com.example.tasksapp.roomdb.ListEntity
+import com.example.tasksapp.roomdb.TaskDao
 import com.example.tasksapp.roomdb.TaskEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TaskViewModel: ViewModel() {
+class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
 
 
-    val taskDao = DataBaseInstance.taskDatabase.getTaskDao()
-    val taskList : LiveData<List<TaskEntity>> = taskDao.getAllTask()
-    val listList : LiveData<List<ListEntity>> = taskDao.getAllList()
-
-
-
-    fun addTask(taskEntered :String){
-        viewModelScope.launch(Dispatchers.IO) {
-            taskDao.addTask(TaskEntity(taskEntered = taskEntered, listId = 1))
-        }
+    // Live data to hold tabs and tasks
+    val tabs = mutableStateListOf<ListEntity>()
+    val tasks = mutableStateMapOf<String, List<TaskEntity>>()
+    var currentListName = mutableStateOf("")
+    fun updateCurrentListName(newListName: String) {
+        currentListName.value = newListName
     }
 
+
+    init {
+        viewModelScope.launch {
+            tabs.add(ListEntity("Starred"))
+            tabs.add(ListEntity("My Tasks"))
+            tabs.addAll(taskDao.getlist())
+            for (tab in tabs) {
+                tasks[tab.listName] = taskDao.getTask(tab.listName)
+            }
+        }
+    }
+    fun addTask(taskEntered :String,listName: String){
+        viewModelScope.launch {
+            taskDao.addTask(TaskEntity(taskEntered = taskEntered, listName = listName))
+            tasks[listName] = taskDao.getTask(listName)
+        }
+    }
+    fun deletelist(listName: String){
+        viewModelScope.launch {
+            taskDao.deletelist(listName)
+            taskDao.deletetasksOflist(listName)
+            tabs.remove(ListEntity(listName))
+            tasks.remove(listName)
+        }
+    }
     fun addList(listName : String){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             taskDao.addList(listEntity = ListEntity(listName = listName))
+            tabs.add(ListEntity(listName = listName))
         }
     }
 
 
     fun deleteTask(id : Int){
         viewModelScope.launch(Dispatchers.IO) {
-            taskDao.deleteTask(id)
+//            taskDao.deleteTask(id)
         }
     }
 }

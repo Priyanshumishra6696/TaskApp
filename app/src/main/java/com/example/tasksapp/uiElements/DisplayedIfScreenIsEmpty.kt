@@ -202,7 +202,7 @@ fun TaskPageIfEmpty() {
 }
 
 @Composable
-fun GeneralPage(viewModel: TaskViewModel,page: Int) {
+fun GeneralPage(viewModel: TaskViewModel,listName: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,7 +226,7 @@ fun GeneralPage(viewModel: TaskViewModel,page: Int) {
         ) {
             Text(
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-                text = "hey ya",
+                text = listName,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -243,7 +243,9 @@ fun GeneralPage(viewModel: TaskViewModel,page: Int) {
                     )
                 }
                 Button(
-                    onClick = {},
+                    onClick = {
+                        viewModel.deletelist(listName)
+                    },
                     colors = ButtonDefaults.buttonColors(Color(18,19,22))
                 ){
                     Icon(Icons.Default.MoreVert, contentDescription = "", tint = Color.White)

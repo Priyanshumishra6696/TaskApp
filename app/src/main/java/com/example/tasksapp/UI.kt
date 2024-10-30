@@ -33,7 +33,6 @@ import com.example.tasksapp.uiElements.Tabs
 @Composable
 fun UI(viewModel: TaskViewModel,navController: NavController){
 
-
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember{ mutableStateOf(false) }
     var taskEntered by remember { mutableStateOf("") }
@@ -89,7 +88,7 @@ fun UI(viewModel: TaskViewModel,navController: NavController){
 
             }
             Button(modifier = Modifier.padding(start = 16.dp), onClick = {
-                viewModel.addTask(taskEntered)
+                viewModel.addTask(taskEntered, viewModel.currentListName.toString())
                 taskEntered=""
                 showBottomSheet = false
             }) {
