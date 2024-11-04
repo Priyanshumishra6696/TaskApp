@@ -1,5 +1,6 @@
 package com.example.tasksapp
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,9 +18,14 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
     // Live data to hold tabs and tasks
     val tabs = mutableStateListOf<ListEntity>()
     val tasks = mutableStateMapOf<String, List<TaskEntity>>()
-    var currentListName = mutableStateOf("")
-    fun updateCurrentListName(newListName: String) {
-        currentListName.value = newListName
+    var currentListName = mutableStateOf("My Tasks")
+    val selected = mutableStateOf(1)
+    val showModalBottomSheet = mutableStateOf(false)
+    fun getCurrList(): String {
+        return currentListName.value
+    }
+    fun updateCurrentListName(listName: String){
+        currentListName.value = listName
     }
 
 
@@ -55,9 +61,10 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
     }
 
 
-    fun deleteTask(id : Int){
+    fun deleteTask(id : Int,listName: String){
         viewModelScope.launch(Dispatchers.IO) {
-//            taskDao.deleteTask(id)
+            taskDao.deleteTask(id)
+            tasks[listName] = taskDao.getTask(listName)
         }
     }
 }

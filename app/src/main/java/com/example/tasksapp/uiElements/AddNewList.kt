@@ -50,7 +50,9 @@ fun AddNewList(viewModel: TaskViewModel,navController: NavController){
 
                 Spacer(modifier = Modifier.weight(1f))
                 Button(onClick = {
+                        viewModel.selected.value = viewModel.tabs.size
                         viewModel.addList(text)
+                        viewModel.updateCurrentListName(text)
                         navController.navigate("Start_Page")
                     },
                     colors = ButtonDefaults.buttonColors(Color(18,19,22))

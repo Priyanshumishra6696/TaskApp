@@ -68,7 +68,9 @@ fun UI(viewModel: TaskViewModel,navController: NavController){
     }
     if(showBottomSheet){
         ModalBottomSheet(
-            onDismissRequest = {showBottomSheet = false },
+            onDismissRequest = {
+                taskEntered=""
+                showBottomSheet = false },
             sheetState = sheetState,
 
         ) {
@@ -88,7 +90,8 @@ fun UI(viewModel: TaskViewModel,navController: NavController){
 
             }
             Button(modifier = Modifier.padding(start = 16.dp), onClick = {
-                viewModel.addTask(taskEntered, viewModel.currentListName.toString())
+                viewModel.addTask(taskEntered,viewModel.getCurrList())
+
                 taskEntered=""
                 showBottomSheet = false
             }) {
@@ -98,6 +101,8 @@ fun UI(viewModel: TaskViewModel,navController: NavController){
     }
 
 }
+
+
 
 
 

@@ -86,7 +86,7 @@ fun TaskColumn(viewModel: TaskViewModel,taskList : List<TaskEntity>){
             LazyColumn(
                 content = {
                     itemsIndexed(taskList) { index, item: TaskEntity ->
-                        TaskBlock(title = item.taskEntered, { viewModel.deleteTask(item.id) })
+                        TaskBlock(title = item.taskEntered, { viewModel.deleteTask(item.id,viewModel.getCurrList())})
                     }
                 }
             )

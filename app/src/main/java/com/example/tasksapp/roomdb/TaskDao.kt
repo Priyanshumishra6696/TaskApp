@@ -24,4 +24,7 @@ interface TaskDao {
 
     @Query("delete from taskentity where listName=:listName")
     suspend fun deletetasksOflist(listName: String)
+
+    @Query("delete from taskentity where id=:id")
+    suspend fun deleteTask(id:Int)
 }
