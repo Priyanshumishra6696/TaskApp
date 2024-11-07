@@ -5,15 +5,12 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.example.tasksapp.TaskViewModel
+import com.example.tasksapp.roomdb.TaskEntity
 
 @Composable
 fun Tabs(viewModel: TaskViewModel,navController: NavController){
@@ -29,6 +26,7 @@ fun Tabs(viewModel: TaskViewModel,navController: NavController){
             Tab(
                 selected = viewModel.selected.value==index,
                 onClick = {
+                    viewModel.showCompletedTasks.value= false
                     viewModel.selected.value=index
                     viewModel.updateCurrentListName(title.listName)
                 },
@@ -54,10 +52,10 @@ fun Tabs(viewModel: TaskViewModel,navController: NavController){
             StarredPage()
         }
         (viewModel.selected.value==1) -> {
-            if(viewModel.tasks["My Tasks"]?.isEmpty() == true){
+            if(viewModel.tasks["My Tasks"].isNullOrEmpty() && viewModel.completedTasksMapper["My Tasks"].isNullOrEmpty()){
                 TaskPageIfEmpty(viewModel)
             }else{
-                viewModel.tasks["My Tasks"]?.let { TaskColumn(viewModel, it) }
+                viewModel.tasks["My Tasks"]?.let { TaskColumn(viewModel, it,"My Tasks") }
             }
 
         }
@@ -68,13 +66,12 @@ fun Tabs(viewModel: TaskViewModel,navController: NavController){
 //            else if(viewModel.tasks[viewModel.getCurrList()]?.isEmpty() == true){
 //                GeneralPage(viewModel, viewModel.currentListName.value)
 //            }
-            val currentList = viewModel.getCurrList()
-            val tasks = viewModel.tasks[currentList]
 
-            if (!tasks.isNullOrEmpty()) {
-                TaskColumn(viewModel, tasks)
-            } else {
+            if (viewModel.tasks[viewModel.getCurrList()].isNullOrEmpty() && viewModel.completedTasksMapper[viewModel.getCurrList()].isNullOrEmpty()) {
                 GeneralPage(viewModel, viewModel.currentListName.value)
+
+            } else {
+                viewModel.tasks[viewModel.getCurrList()]?.let{TaskColumn(viewModel, it , viewModel.getCurrList())}
             }
         }
         else -> {

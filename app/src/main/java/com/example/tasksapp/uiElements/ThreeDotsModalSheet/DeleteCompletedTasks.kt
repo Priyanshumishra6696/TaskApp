@@ -30,7 +30,10 @@ fun DeleteCompletedTasks(viewModel: TaskViewModel,notAccessible : Boolean){
         }
     }else{
         Row(
-            modifier = Modifier.fillMaxWidth().clickable {  }.height(64.dp),
+            modifier = Modifier.fillMaxWidth().clickable {
+                viewModel.deleteCompletedTaskOfList(viewModel.getCurrList())
+                viewModel.showModalBottomSheet.value = false
+            }.height(64.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(

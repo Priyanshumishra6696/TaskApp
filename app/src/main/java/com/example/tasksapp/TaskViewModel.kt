@@ -1,5 +1,6 @@
 package com.example.tasksapp
 
+import android.view.View
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -18,9 +19,12 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
     // Live data to hold tabs and tasks
     val tabs = mutableStateListOf<ListEntity>()
     val tasks = mutableStateMapOf<String, List<TaskEntity>>()
+    val completedTasksMapper = mutableStateMapOf<String,List<TaskEntity>>()
     var currentListName = mutableStateOf("My Tasks")
     val selected = mutableStateOf(1)
     val showModalBottomSheet = mutableStateOf(false)
+    val showCompletedTasks = mutableStateOf(false)
+    val uncompletedTasks = mutableStateMapOf<String , List<TaskEntity>>()
     fun getCurrList(): String {
         return currentListName.value
     }
@@ -36,6 +40,8 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
             tabs.addAll(taskDao.getlist())
             for (tab in tabs) {
                 tasks[tab.listName] = taskDao.getTask(tab.listName)
+                completedTasksMapper[tab.listName] = taskDao.getCompletedTask(listName = tab.listName)
+                uncompletedTasks[tab.listName] = taskDao.getuncompletedtask(tab.listName)
             }
         }
     }
@@ -43,12 +49,14 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
         viewModelScope.launch {
             taskDao.addTask(TaskEntity(taskEntered = taskEntered, listName = listName))
             tasks[listName] = taskDao.getTask(listName)
+            uncompletedTasks[listName] = taskDao.getuncompletedtask(listName)
         }
     }
     fun deletelist(listName: String){
         viewModelScope.launch {
             taskDao.deletelist(listName)
             taskDao.deletetasksOflist(listName)
+
             tabs.remove(ListEntity(listName))
             tasks.remove(listName)
         }
@@ -60,6 +68,21 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
         }
     }
 
+    fun updateCompletedTask(completedTask : String , listName : String){
+        viewModelScope.launch {
+            taskDao.addTask(TaskEntity(taskEntered = completedTask, listName = listName, taskCheck = true))
+            completedTasksMapper[listName] = taskDao.getCompletedTask(listName = listName)
+            uncompletedTasks[listName] = taskDao.getuncompletedtask(listName)
+        }
+    }
+
+    fun deleteCompletedTaskOfList(listName: String){
+        viewModelScope.launch {
+            taskDao.deleteCompletedTaskOfList(listName)
+            completedTasksMapper[listName] = taskDao.getCompletedTask(listName)
+            tasks[listName] = taskDao.getTask(listName)
+        }
+    }
 
     fun deleteTask(id : Int,listName: String){
         viewModelScope.launch(Dispatchers.IO) {
