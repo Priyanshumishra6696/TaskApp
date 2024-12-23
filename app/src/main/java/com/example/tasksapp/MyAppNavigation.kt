@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.tasksapp.uiElements.AddNewList
+import com.example.tasksapp.uiElements.TaskPage.TaskPageUI
 
 @Composable
 fun MyAppNavigation(viewModel: TaskViewModel){
@@ -19,6 +20,9 @@ fun MyAppNavigation(viewModel: TaskViewModel){
             }
             composable("Create_List_Page"){
                 AddNewList(viewModel,navController)
+            }
+            composable("task_ui"){
+                TaskPageUI(viewModel, viewModel.getCurrTask(),navController)
             }
         }
     )

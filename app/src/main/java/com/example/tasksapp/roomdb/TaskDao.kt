@@ -7,6 +7,9 @@ import androidx.room.Upsert
 @Dao
 interface TaskDao {
 
+    @Query("UPDATE TaskEntity SET taskDetails = :details where id = :id")
+    suspend fun updatetaskDetails( id:Int , details : String)
+
     @Upsert
     suspend fun addList(listEntity: ListEntity)
 

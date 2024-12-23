@@ -55,7 +55,7 @@ fun Tabs(viewModel: TaskViewModel,navController: NavController){
             if(viewModel.tasks["My Tasks"].isNullOrEmpty() && viewModel.completedTasksMapper["My Tasks"].isNullOrEmpty()){
                 TaskPageIfEmpty(viewModel)
             }else{
-                viewModel.tasks["My Tasks"]?.let { TaskColumn(viewModel, it,"My Tasks") }
+                viewModel.tasks["My Tasks"]?.let { TaskColumn(viewModel, it,"My Tasks",navController) }
             }
 
         }
@@ -71,7 +71,10 @@ fun Tabs(viewModel: TaskViewModel,navController: NavController){
                 GeneralPage(viewModel, viewModel.currentListName.value)
 
             } else {
-                viewModel.tasks[viewModel.getCurrList()]?.let{TaskColumn(viewModel, it , viewModel.getCurrList())}
+                viewModel.tasks[viewModel.getCurrList()]?.let{TaskColumn(
+                    viewModel, it, viewModel.getCurrList(),
+                    navController = navController
+                )}
             }
         }
         else -> {

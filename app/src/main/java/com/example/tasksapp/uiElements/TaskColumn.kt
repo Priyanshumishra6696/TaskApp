@@ -2,6 +2,7 @@ package com.example.tasksapp.uiElements
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.navOptions
 import com.example.tasksapp.R
 import com.example.tasksapp.TaskViewModel
 import com.example.tasksapp.roomdb.TaskEntity
@@ -45,7 +48,8 @@ import com.example.tasksapp.uiElements.ThreeDotsModalSheet.MainStructureModalBot
 fun TaskColumn(
     viewModel: TaskViewModel,
     taskList: List<TaskEntity>,
-    listName : String
+    listName : String,
+    navController: NavController
 ){
 //    LazyColumn(
 //        content = {
@@ -55,9 +59,9 @@ fun TaskColumn(
 //        }
 //    )
     if(viewModel.uncompletedTasks[listName].isNullOrEmpty()){
-        Displayone(viewModel, taskList,listName)
+        Displayone(viewModel, taskList,listName,navController)
     }else{
-        Displaytwo(viewModel,taskList,listName)
+        Displaytwo(viewModel,taskList,listName,navController)
     }
     if(viewModel.getCurrList()=="My Tasks"){
         MainStructureModalBottomSheet(viewModel,true,false)
@@ -73,11 +77,15 @@ fun TaskColumn(
 
 
 @Composable
-fun TaskBlock(viewModel: TaskViewModel,taskEntity: TaskEntity,title : String ,onDelete:()->Unit){
+fun TaskBlock(viewModel: TaskViewModel,taskEntity: TaskEntity,title : String ,onDelete:()->Unit,navController: NavController){
     var isChecked by remember { mutableStateOf(false) }
     if(!taskEntity.taskCheck) {
         Row(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(24.dp)
+                .clickable {
+                    viewModel.updatecurrtask(taskEntity)
+                    navController.navigate("task_ui")
+                },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 //        Checkbox(
@@ -112,9 +120,13 @@ fun TaskBlock(viewModel: TaskViewModel,taskEntity: TaskEntity,title : String ,on
 
 }
 @Composable
-fun CompletedTaskBlock(viewModel: TaskViewModel,taskEntity: TaskEntity,title : String ,onDelete:()->Unit){
+fun CompletedTaskBlock(viewModel: TaskViewModel,taskEntity: TaskEntity,title : String ,onDelete:()->Unit,navController: NavController){
     Row(
-        modifier = Modifier.padding(24.dp),
+        modifier = Modifier.padding(24.dp)
+            .clickable {
+                viewModel.updatecurrtask(taskEntity)
+                navController.navigate("task_ui")
+            },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 //        Checkbox(
@@ -140,7 +152,7 @@ fun CompletedTaskBlock(viewModel: TaskViewModel,taskEntity: TaskEntity,title : S
 }
 
 @Composable
-fun Displayone(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: String){
+fun Displayone(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: String,navController: NavController){
     Column() {
         TaskCompleted(viewModel)
         if(!viewModel.completedTasksMapper[listName].isNullOrEmpty()) {
@@ -187,7 +199,8 @@ fun Displayone(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: S
                                     CompletedTaskBlock(viewModel,
                                         taskEntity = item,
                                         title = item.taskEntered,
-                                        onDelete = {}
+                                        onDelete = {},
+                                        navController = navController
                                     )
                                 }
                             }
@@ -201,7 +214,7 @@ fun Displayone(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: S
 }
 
 @Composable
-fun Displaytwo(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: String){
+fun Displaytwo(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: String,navController: NavController){
     Column() {
         Column(
             modifier = Modifier
@@ -252,10 +265,13 @@ fun Displaytwo(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: S
                 LazyColumn(
                     content = {
                         itemsIndexed(taskList) { index, item: TaskEntity ->
-                            TaskBlock(viewModel,
+                            TaskBlock(
+                                viewModel,
                                 taskEntity = item,
                                 title = item.taskEntered,
-                                { viewModel.deleteTask(item.id, viewModel.getCurrList()) })
+                                { viewModel.deleteTask(item.id, viewModel.getCurrList()) },
+                                navController = navController
+                            )
                         }
                     }
                 )
@@ -308,7 +324,8 @@ fun Displaytwo(viewModel: TaskViewModel, taskList: List<TaskEntity>, listName: S
                                     CompletedTaskBlock(viewModel,
                                         taskEntity = item,
                                         title = item.taskEntered,
-                                        onDelete = {}
+                                        onDelete = {},
+                                        navController
                                     )
                                 }
                             }

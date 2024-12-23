@@ -1,7 +1,5 @@
 package com.example.tasksapp
 
-import android.view.View
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +15,7 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
 
 
     // Live data to hold tabs and tasks
+    val currtask = mutableStateOf(TaskEntity(id = 0, taskEntered = "", taskCheck = false, listName = "", taskDetails = ""))
     val tabs = mutableStateListOf<ListEntity>()
     val tasks = mutableStateMapOf<String, List<TaskEntity>>()
     val completedTasksMapper = mutableStateMapOf<String,List<TaskEntity>>()
@@ -30,6 +29,12 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
     }
     fun updateCurrentListName(listName: String){
         currentListName.value = listName
+    }
+    fun getCurrTask() : TaskEntity{
+        return currtask.value
+    }
+    fun updatecurrtask(task : TaskEntity){
+        currtask.value = task
     }
 
 
@@ -50,6 +55,14 @@ class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
             taskDao.addTask(TaskEntity(taskEntered = taskEntered, listName = listName))
             tasks[listName] = taskDao.getTask(listName)
             uncompletedTasks[listName] = taskDao.getuncompletedtask(listName)
+        }
+    }
+    fun updateTaskDetails(details:String,task: TaskEntity){
+        viewModelScope.launch {
+            taskDao.updatetaskDetails(task.id,details)
+            completedTasksMapper[task.listName] = taskDao.getCompletedTask(listName = task.listName)
+            uncompletedTasks[task.listName] = taskDao.getuncompletedtask(task.listName)
+            tasks[task.listName] = taskDao.getTask(task.listName)
         }
     }
     fun deletelist(listName: String){
